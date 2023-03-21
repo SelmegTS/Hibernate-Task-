@@ -15,9 +15,7 @@ public class UserDaoHibernateImpl implements UserDao {
     Session session;
 
     public UserDaoHibernateImpl() {
-
     }
-
 
     @Override
     public void createUsersTable() {
@@ -54,16 +52,11 @@ public class UserDaoHibernateImpl implements UserDao {
         session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
         User user = new User();
-
+        user.setName(name);
+        user.setLastName(lastName);
+        user.setAge(age);
         try {
-            user.setName(name);
-            user.setLastName(lastName);
-            user.setAge(age);
-            session.createSQLQuery("INSERT INTO users (name, lastname, age) VALUES (?, ?, ?)")
-                    .setParameter(1, user.getName())
-                    .setParameter(2, user.getLastName())
-                    .setParameter(3, user.getAge())
-                    .executeUpdate();
+            session.save(user);
             transaction.commit();
             System.out.println("User c именем - " + name + " добавлен в базу данных");
         } catch (HibernateException e) {
@@ -79,9 +72,8 @@ public class UserDaoHibernateImpl implements UserDao {
         session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
         try {
-            session.createSQLQuery("DELETE FROM users WHERE id = ?")
-                    .setParameter(1, id)
-                    .executeUpdate();
+            User user = session.get(User.class, id);
+            session.delete(user);
             transaction.commit();
         } catch (HibernateException e) {
             transaction.rollback();
